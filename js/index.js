@@ -1,8 +1,8 @@
-$(function(){
-	$("#buy").click(function(){
+$(function() {
+	$("#buy").click(function() {
 		location.href = "buy.html";
 	})
-	$(".goodList .goodInfo .addToCart").click(function(){
+	$(".goodList .goodInfo .addToCart").click(function(evt) {
 		//获取goodId
 		var goodId = $(this).parent().attr("data-good-id");
 		//点击时获取图片
@@ -11,7 +11,7 @@ $(function(){
 		var goodName = $(this).prev().prev().html();
 		//商品单价
 		var goodPrice = parseInt($(this).prev().html());
-		
+
 		/*
 		 设计cookie
 		 cooiekey : cart
@@ -42,31 +42,55 @@ $(function(){
 		//将cookie字符串转为对象
 		var cookieObj = convertCookieStrToCookieObj(cookieStr);
 		//判断商品是否在cookie中
-		if(goodId in cookieObj){
-			cookieObj[goodId].num++		//在的话只需要将数量增加
-		}else{
+		if(goodId in cookieObj) {
+			cookieObj[goodId].num++ //在的话只需要将数量增加
+		} else {
 			//添加新的商品
 			cookieObj[goodId] = {
-				"src" : src,
-				"goodname" : goodName,
-				"goodPrice" : goodPrice,
-				"num" : 1
+				"src": src,
+				"goodname": goodName,
+				"goodPrice": goodPrice,
+				"num": 1
 			}
 		}
 		//创建cookie
-		$.cookie("cart",JSON.stringify(cookieObj),{expires : 7,path : '/'});
-		
-		
+		$.cookie("cart", JSON.stringify(cookieObj), {
+			expires: 7,
+			path: '/'
+		});
+
 		//使用插件飞入效果
-		
+		var $img = $(this).siblings('img').clone().css({
+			width: 50,
+			height: 50
+		});
+		$img.fly({
+			start: {
+				left: event.pageX, //开始位置（必填）#fly元素会被设置成position: fixed
+				top: event.pageY //开始位置（必填）
+			},
+			end: {
+				left: $('#buy').offset().left, //结束位置（必填）
+				top: $('#buy').offset().top, //结束位置（必填）
+				width: 0, //结束时宽度
+				height: 0 //结束时高度
+			},
+			onEnd: function() { //结束回调
+				var $buy = $('#buy');
+				var re = /(\d+)/;
+				var num = parseInt(re.exec($buy.val())[1]);
+				$buy.val("购物车(" + (num + 1) + ")");
+
+			}
+		});
 	})
 })
 
 //封装函数，将cookie字符串转为对象
-function convertCookieStrToCookieObj(cookieStr){
-	if(!cookieStr){
+function convertCookieStrToCookieObj(cookieStr) {
+	if(!cookieStr) {
 		return {};
-	}else{
+	} else {
 		return JSON.parse(cookieStr);
 	}
 }
