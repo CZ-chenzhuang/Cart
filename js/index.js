@@ -1,4 +1,5 @@
 $(function() {
+	initcart();
 	$("#buy").click(function() {
 		location.href = "buy.html";
 	})
@@ -6,7 +7,7 @@ $(function() {
 		//获取goodId
 		var goodId = $(this).parent().attr("data-good-id");
 		//点击时获取图片
-		var src = $(this).parent().first().attr("src");
+		var goodSrc = $(this).siblings('img').attr("src");
 		//商品名称
 		var goodName = $(this).prev().prev().html();
 		//商品单价
@@ -47,7 +48,7 @@ $(function() {
 		} else {
 			//添加新的商品
 			cookieObj[goodId] = {
-				"src": src,
+				"goodSrc": goodSrc,
 				"goodname": goodName,
 				"goodPrice": goodPrice,
 				"num": 1
@@ -80,17 +81,28 @@ $(function() {
 				var re = /(\d+)/;
 				var num = parseInt(re.exec($buy.val())[1]);
 				$buy.val("购物车(" + (num + 1) + ")");
-
+				$img.remove();
 			}
 		});
+		
 	})
 })
 
 //封装函数，将cookie字符串转为对象
-function convertCookieStrToCookieObj(cookieStr) {
+function convertCookieStrToCookieObj(cookieStr){
 	if(!cookieStr) {
 		return {};
 	} else {
 		return JSON.parse(cookieStr);
 	}
+}
+//初始化页面的购物车的个数
+function initcart(){
+	var cookieStr = $.cookie("cart") ? $.cookie("cart") : '';
+	var cookieObj = convertCookieStrToCookieObj(cookieStr);
+	var num = 0;
+	for(var key in cookieObj){
+		num += cookieObj[key].num
+	}
+	$('#buy').val("购物车(" + num + ")");
 }
